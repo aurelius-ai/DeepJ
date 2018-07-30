@@ -16,7 +16,7 @@ from constants import *
 from midi_io import load_midi
 from util import *
 
-def load(styles=STYLES):
+def load(styles=STYLES, tensorflow=False):
     """
     Loads all music styles into a list of compositions
     """
@@ -31,7 +31,10 @@ def load(styles=STYLES):
                 # Pad the sequence by an empty event
                 seq = load_midi(f)
                 if len(seq) >= SEQ_LEN:
-                    style_seq.append(torch.from_numpy(seq).long())
+                    if tensorflow:
+                        style_seq.append(seq)
+                    else:
+                        style_seq.append(torch.from_numpy(seq).long())
                     seq_len_sum += len(seq)
                 else:
                     print('Ignoring {} because it is too short {}.'.format(f, len(seq)))
@@ -42,16 +45,19 @@ def load(styles=STYLES):
         print('Loading {} MIDI file(s) with average event count {}'.format(len(style_seq), seq_len_sum / len(style_seq)))
     return style_seqs
 
-def process(style_seqs):
+def process(style_seqs, tensorflow=False):
     """
     Process data. Takes a list of styles and flattens the data, returning the necessary tags.
     """
     # Flatten into compositions list
     seqs = [s for y in style_seqs for s in y]
-    style_tags = torch.LongTensor([s for s, y in enumerate(style_seqs) for x in y])
+    if tensorflow:
+        style_tags = [s for s, y in enumerate(style_seqs) for x in y]
+    else:
+        style_tags = torch.LongTensor([s for s, y in enumerate(style_seqs) for x in y])
     return seqs, style_tags
 
-def validation_split(data, split=0.05):
+def validation_split(data, split=0.05, tensorflow=False):
     """
     Splits the data iteration list into training and validation indices
     """
@@ -73,10 +79,16 @@ def validation_split(data, split=0.05):
 
     train_style_tags = [style_tags[i] for i in train_indicies]
     val_style_tags = [style_tags[i] for i in val_indicies]
+
+    if tensorflow:
+        train_seqs = np.array(train_seqs)
+        val_seqs = np.array(val_seqs)
+        train_style_tags = np.array(train_style_tags)
+        val_style_tags = np.array(val_style_tags)
     
     return (train_seqs, train_style_tags), (val_seqs, val_style_tags)
 
-def sampler(data):
+def sampler(data, tensorflow=False):
     """
     Generates sequences of data.
     """
@@ -99,19 +111,26 @@ def sampler(data):
         seq = gen_to_tensor(seq)
         assert seq.size() == (seq_len,), seq.size()
 
+        if tensorflow:
+            tags = style_tags[seq_id:seq_id+1]
+        else:
+            tags = torch.LongTensor(style_tags[seq_id:seq_id+1])
+
         return (
             seq,
             # Need to retain the tensor object. Hence slicing is used.
-            torch.LongTensor(style_tags[seq_id:seq_id+1])
+            tags
         )
     return sample
 
-def batcher(sampler, batch_size, seq_len=SEQ_LEN):
+def batcher(sampler, batch_size, seq_len=SEQ_LEN, tensorflow=False):
     """
     Bundles samples into batches
     """
     def batch():
         batch = [sampler(seq_len) for i in range(batch_size)]
+        if tensorflow:
+            return [np.stack(x) for x in zip(*batch)]
         return [torch.stack(x) for x in zip(*batch)]
     return batch 
 
