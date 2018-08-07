@@ -3,6 +3,7 @@ from tensorflow import keras
 from dataset import *
 from constants import *
 from model_tf import *
+from util import *
 
 BATCH_SIZE = 16
 
@@ -18,6 +19,10 @@ def train(model):
     train_batcher = batcher(sampler(train_data_and_labels, tensorflow=True), BATCH_SIZE, tensorflow=True)
     val_batcher = batcher(sampler(val_data_and_labels, tensorflow=True), BATCH_SIZE, tensorflow=True)
     train_data, train_labels = train_batcher()
+     # Convert style labels to one hot vectors
+    train_labels = one_hot_batch(train_labels, NUM_STYLES, tensorflow=True)
+    train_data = train_data.astype(float)
+    train_data = [train_data, train_labels]
 
     cbs = [
         keras.callbacks.EarlyStopping(monitor='loss', patience=20)

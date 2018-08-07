@@ -130,7 +130,9 @@ def compute_loss(model, data, volatile=False):
     """
     # Convert all tensors into variables
     note_seq, styles = data
+    print('STYLES before: ', styles)
     styles = var(one_hot_batch(styles, NUM_STYLES), volatile=volatile)
+    print('STYLES after: ', styles)
 
     # Feed it to the model
     inputs = var(note_seq[:, :-1], volatile=volatile)

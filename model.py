@@ -29,15 +29,10 @@ class DeepJ(nn.Module):
     def forward(self, x, style, memory=None):
         batch_size = x.size(0)
         seq_len = x.size(1)
-        # print('X: ', x)
-        # print('BATCH SIZE: ', batch_size)
-        # print('SEQ LEN: ', seq_len)
 
         # Distributed style representation
         style = self.style_linear(style)
-        print('STYLE BEFORE: ', style, style.size())
         style = style.unsqueeze(1).expand(batch_size, seq_len, self.style_units)
-        print('STYLE AFTER: ', style, style.size())
         x = self.embedding(x)
         x = torch.cat((x, style), dim=2)
 

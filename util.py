@@ -151,10 +151,16 @@ def one_hot(index, size):
     return x
 
 
-def one_hot_batch(index_batch, n):
-    one_hot = torch.FloatTensor(index_batch.size(0), n).zero_()
-    one_hot.scatter_(1, index_batch, 1.0)
-    return one_hot
+def one_hot_batch(index_batch, n, tensorflow=False):
+    if tensorflow:
+        one_hot_batch = []
+        for b in index_batch:
+            one_hot_batch.append(one_hot(b[0], n))
+        return np.array(one_hot_batch)
+    else:
+        one_hot_batch = torch.FloatTensor(index_batch.size(0), n).zero_()
+        one_hot_batch.scatter_(1, index_batch, 1.0)
+        return one_hot_batch
 
 
 def one_hot_seq(index_batch, n):
