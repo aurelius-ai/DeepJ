@@ -136,7 +136,10 @@ def compute_loss(model, data, volatile=False):
 
     # Feed it to the model
     inputs = var(note_seq[:, :-1], volatile=volatile)
+    print('NOTE SEQ: ', note_seq)
+    print('INPUTS: ', inputs)
     targets = var(note_seq[:, 1:], volatile=volatile)
+    print('TARGETS: ', targets)
     output, _ = model(inputs, styles, None)
 
     # Compute the loss.

@@ -18,18 +18,20 @@ def train(model):
     train_data_and_labels, val_data_and_labels = validation_split(data, tensorflow=True)
     train_batcher = batcher(sampler(train_data_and_labels, tensorflow=True), BATCH_SIZE, tensorflow=True)
     val_batcher = batcher(sampler(val_data_and_labels, tensorflow=True), BATCH_SIZE, tensorflow=True)
-    train_data, train_labels = train_batcher()
+    train_notes, train_styles = train_batcher()
      # Convert style labels to one hot vectors
-    train_labels = one_hot_batch(train_labels, NUM_STYLES, tensorflow=True)
-    train_data = train_data.astype(float)
-    train_data = [train_data, train_labels]
+    train_styles = one_hot_batch(train_styles, NUM_STYLES, tensorflow=True)
+    train_notes = train_notes.astype(float)
+    inputs = train_notes[:, :-1]
+    targets = train_notes[:, 1:]
+    train_notes = [inputs, train_styles]
 
     cbs = [
         keras.callbacks.EarlyStopping(monitor='loss', patience=20)
     ]
 
     print('Training...')
-    model.fit(train_data, train_labels, epochs=1000, callbacks=cbs, batch_size=BATCH_SIZE)
+    model.fit(train_notes, targets, epochs=1000, callbacks=cbs, batch_size=BATCH_SIZE)
 
 if __name__ == '__main__':
     main()
