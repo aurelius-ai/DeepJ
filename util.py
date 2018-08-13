@@ -153,21 +153,30 @@ def one_hot(index, size):
 
 def one_hot_batch(index_batch, n, tensorflow=False):
     if tensorflow:
-        one_hot_batch = []
+        one_hot_result = []
         for b in index_batch:
-            one_hot_batch.append(one_hot(b[0], n))
-        return np.array(one_hot_batch)
+            one_hot_result.append(one_hot(b[0], n))
+        return np.array(one_hot_result)
     else:
-        one_hot_batch = torch.FloatTensor(index_batch.size(0), n).zero_()
-        one_hot_batch.scatter_(1, index_batch, 1.0)
-        return one_hot_batch
+        one_hot_result = torch.FloatTensor(index_batch.size(0), n).zero_()
+        one_hot_result.scatter_(1, index_batch, 1.0)
+        return one_hot_result
 
 
-def one_hot_seq(index_batch, n):
-    one_hot = torch.FloatTensor(index_batch.size(
-        0), index_batch.size(1), n).zero_()
-    one_hot.scatter_(2, index_batch.unsqueeze(2), 1.0)
-    return one_hot
+def one_hot_seq(index_batch, n, tensorflow=False):
+    if tensorflow:
+        one_hot_result = []
+        for x in index_batch:
+            row = []
+            for y in x:
+                row.append(one_hot(int(y), n))
+            one_hot_result.append(row)
+        return np.array(one_hot_result)
+    else:
+        one_hot_result = torch.FloatTensor(index_batch.size(
+            0), index_batch.size(1), n).zero_()
+        one_hot_result.scatter_(2, index_batch.unsqueeze(2), 1.0)
+        return one_hot_result
 
 
 def get_all_files(paths, ext='.mid'):

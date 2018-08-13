@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from dataset import *
@@ -24,6 +25,8 @@ def train(model):
     train_notes = train_notes.astype(float)
     inputs = train_notes[:, :-1]
     targets = train_notes[:, 1:]
+    # Tensorflow cross entropy loss expects one hot vectors for targets
+    targets = one_hot_seq(targets, NUM_ACTIONS, tensorflow=True)
     train_notes = [inputs, train_styles]
 
     cbs = [
