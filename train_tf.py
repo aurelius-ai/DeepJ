@@ -25,7 +25,7 @@ def train(model, batch_size, epochs):
     train_notes = [inputs, train_styles]
 
     cbs = [
-        keras.ModelCheckpoint(MODEL_FILE, monitor='loss', save_best_only=True, save_weights_only=True),
+        keras.callbacks.ModelCheckpoint(MODEL_FILE, monitor='loss', save_best_only=True, save_weights_only=True),
         keras.callbacks.EarlyStopping(monitor='loss', patience=20)
     ]
 
