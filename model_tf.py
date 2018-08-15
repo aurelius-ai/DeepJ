@@ -18,6 +18,7 @@ def deepj():
         # style = tf.to_float(style)
         x = keras.layers.Embedding(1, NUM_UNITS)(x)
         x = keras.layers.Concatenate(axis=2)([x, style])
+        x = keras.layers.LSTM(512, return_sequences=True)(x)
         x = output_dense(x)
         return x
     return f

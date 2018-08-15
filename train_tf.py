@@ -25,8 +25,9 @@ def train(model):
     train_notes = train_notes.astype(float)
     inputs = train_notes[:, :-1]
     targets = train_notes[:, 1:]
-    # Tensorflow cross entropy loss expects one hot vectors for targets
-    targets = one_hot_seq(targets, NUM_ACTIONS, tensorflow=True)
+    # Tensorflow cross entropy loss expects targets to be in categorical format
+    # targets = one_hot_seq(targets, NUM_ACTIONS, tensorflow=True)
+    targets = keras.utils.to_categorical(targets, NUM_ACTIONS)
     train_notes = [inputs, train_styles]
 
     cbs = [
