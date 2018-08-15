@@ -35,6 +35,7 @@ NUM_STYLES = len(STYLES)
 OUT_DIR = 'out'
 CACHE_DIR = 'out/cache'
 SAMPLES_DIR = 'out/samples'
+MODEL_FILE = 'out/model.h5'
 # Synthesizer sound file
 SOUND_FONT_PATH = CACHE_DIR + '/soundfont.sf2'
 SOUND_FONT_URL = 'http://zenvoid.org/audio/acoustic_grand_piano_ydp_20080910.sf2'
