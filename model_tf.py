@@ -13,7 +13,7 @@ def deepj(num_units=512, style_units=32):
         style = keras.layers.Lambda(lambda z: tf.expand_dims(z, 1))(style)
         style = keras.layers.Lambda(lambda z: tf.tile(z, [1, seq_len, 1]))(style)
         # style = tf.to_float(style)
-        x = keras.layers.Embedding(1, num_units)(x)
+        x = keras.layers.Embedding(NUM_ACTIONS, num_units)(x)
         x = keras.layers.Concatenate(axis=2)([x, style])
         # TODO: 3 stacked LSTM
         x = keras.layers.LSTM(512, return_sequences=True)(x)
