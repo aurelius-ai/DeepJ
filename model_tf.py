@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 from constants import *
 
-def deepj(num_units=512, style_units=32):
+def deepj(num_units=512, style_units=32, num_layers=5):
     style_dense = keras.layers.Dense(style_units, activation=tf.nn.relu, input_shape=(NUM_STYLES,))
     output_dense = keras.layers.Dense(NUM_ACTIONS, activation=tf.nn.softmax)
 
@@ -15,8 +15,8 @@ def deepj(num_units=512, style_units=32):
         # style = tf.to_float(style)
         x = keras.layers.Embedding(NUM_ACTIONS, num_units)(x)
         x = keras.layers.Concatenate(axis=2)([x, style])
-        # TODO: 3 stacked LSTM
-        x = keras.layers.LSTM(512, return_sequences=True)(x)
+        for l in range(num_layers):
+            x = keras.layers.CuDNNLSTM(512, return_sequences=True)(x)
         x = output_dense(x)
         return x
     return f
