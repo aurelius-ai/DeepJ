@@ -1,17 +1,18 @@
 import argparse
 import numpy as np
 import tensorflow as tf
+import tensorflowjs as tfjs
 from tensorflow import keras
 from dataset import *
 from constants import *
 from model_tf import *
 from util import *
 
-def generator(batcher, train_len):
+def generator(batcher):
     """
     Generate tuples of note inputs and targets in order to use fit_generator
     """
-    for _ in range(train_len):
+    while True:
         notes, styles = batcher()
         # Convert style labels to one hot vectors
         styles = one_hot_batch(styles, NUM_STYLES, tensorflow=True)
@@ -46,8 +47,9 @@ def train(model, batch_size, epochs):
 
     print('Training...')
     # model.fit(train_notes, targets, epochs=epochs, callbacks=cbs, batch_size=batch_size)
-    train_generator = generator(train_batcher, TRAIN_CYCLES)
+    train_generator = generator(train_batcher)
     model.fit_generator(train_generator, steps_per_epoch=TRAIN_CYCLES, epochs=epochs, callbacks=cbs)
+    tfjs.converters.save_keras_model(model, OUT_DIR)
 
 def main():
     parser = argparse.ArgumentParser(description='Trains model')
